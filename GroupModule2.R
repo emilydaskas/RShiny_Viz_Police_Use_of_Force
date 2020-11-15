@@ -54,7 +54,7 @@ server <- function(input,output) {
       return(NULL)
     }
     
-    uof.long.summary %>%
+    uof_subjects.long.summary %>%
       filter(county == input$selectCounty1 || county == input$selectCounty2)
   })
   
