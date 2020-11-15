@@ -1,0 +1,3 @@
+two county maps
+different sized points/dots indicating the disparity between black and white liklihood use of force (odds)
+if you select use of force vs arrests it will change
