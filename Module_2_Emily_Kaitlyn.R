@@ -132,7 +132,7 @@ server <- function(input,output) {
         geom_bar(stat = "identity")+ 
         coord_flip() +
         scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
-        labs(fill = "County", title = paste0("Odds of a black person getting arrested over a white person in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
+        labs(fill = "County", title = paste0("Odds of a black person getting arrested over a white \nperson in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
              caption = "Towns with missing data are not represented in this graph.") + 
         scale_y_log10() +
         theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1), title = element_text(size = 14, face = "bold"), axis.title = element_blank(), legend.text = element_text(size = 10)) 
