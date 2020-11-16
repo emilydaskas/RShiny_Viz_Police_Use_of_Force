@@ -5,6 +5,8 @@ library(reshape2)
 library(rsconnect)
 library(tidyverse)
 
+#setwd("C:\\Users\\Kaitlyn Abdo\\Desktop\\GroupModule2")
+
 uof <- read.csv("UOF_BY_DEPARTMENTS.csv")
 
 ##subjects data
@@ -140,15 +142,15 @@ server <- function(input,output) {
     
     else if (input$ethnType == "Use of Force Subjects") {
       ggplot(filtered_odds_2(), aes(x = coverage_city, y = odds_ratio_pop, group = county, fill = county)) +
-         geom_bar(stat = "identity")+
-         coord_flip() +
-         scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
-         labs(fill = "County", title = paste0("Odds of use of force being used against a black person \nover a white person in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
-              caption = "Towns with missing data are not represented in this graph.")  +
+        geom_bar(stat = "identity")+
+        coord_flip() +
+        scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
+        labs(fill = "County", title = paste0("Odds of use of force being used against a black person \nover a white person in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
+             caption = "Towns with missing data are not represented in this graph.")  +
         scale_y_log10() +
         theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1), title = element_text(size = 14, face = "bold"), axis.title = element_blank(), legend.text = element_text(size = 10))     }
-   }, height = 720)
- # }}. height = 700))
+  }, height = 720)
+  # }}. height = 700))
   
   output$fact = renderText({
     paste("Disclaimer: Ethnicities marked on forms were up to the discretion of the officers filling out incident forms. In addition to this, some county populations may be under-represented due to missing data or forms lacking options (such as Hispanic not being an option for arrests).")
@@ -164,10 +166,13 @@ server <- function(input,output) {
       tArrB <- summary(aov(black_arrests_pct_2012_2016~factor(county), data=uof_arrests_omit))
       tArrAPI <- summary(aov(api_arrests_pct_2012_2016~factor(county), data=uof_arrests_omit))
       
-      HTML(paste("An ANOVA analysis was performed between the arrests of different ethnic groups and county. The F value is for White subjects is  ",
+      HTML(paste("An ANOVA analysis was performed between the arrests of different ethnic groups and county. The probability >F value is for white suspects is <0.01 and the the F value is ",
                  format(tArrW[[1]][[1,4]],digits=4), ".",
-                 "The F value is for Black subjects is  ", format(tArrB[[1]][[1,4]],digits=4),
-                 ".", "The F value is for Asian/Pacific Islander (API) subjects is  ", format(tArrAPI[[1]][[1,4]],digits=4), ".", "</br>"))
+                 "The probability >F value is for black suspects is <0.01 and the the F value is ", format(tArrB[[1]][[1,4]],digits=4),
+                 ".", "The probability >F value is for API suspects is <0.01 and the the F value is ", format(tArrAPI[[1]][[1,4]],digits=4), ".",
+                 "The null hypothesis would be there is no significant difference between the counties for suspects of different ethnicities.
+                 Since all of probability >F values are extremely small and highly unlikely, we can reject the null hypothesis
+                and assume there is a mean that is not equal to the rest."))
     }
     else if (input$ethnType == "Use of Force Subjects") {
       tForceW <- summary(aov(white_pct_subjects~factor(county), data=uof_subjects_omit))
@@ -175,11 +180,15 @@ server <- function(input,output) {
       tForceH <- summary(aov(hispanic_pct_subjects~factor(county), data=uof_subjects_omit))
       tForceAPI <- summary(aov(asian_pacific_islander_pct_subjects~factor(county), data=uof_subjects_omit))
       
-      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The F value is for White subjects is  ",
+      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The probability >F value is for white suspects is <0.01 and 
+                 the F value is ",
                  format(tForceW[[1]][[1,4]],digits=3), ".",
-                 "The F value is for Black subjects is  ", format(tForceB[[1]][[1,4]],digits=3), ".", 
-                 "The F value is for API subjects is  ", format(tForceAPI[[1]][[1,4]],digits=3), ".",
-                 "The F value is for Hispanic subjects is  ", format(tForceB[[1]][[1,4]], digits=3), "."))
+                 "The probability >F value is for black suspects is <0.01 and the the F value is ", format(tForceB[[1]][[1,4]],digits=3), ".", 
+                 "The probability >F value is for API suspects is <0.01 and the the F value is ", format(tForceAPI[[1]][[1,4]],digits=3), ".",
+                 "The probability >F value is for hispanic suspects is  <0.01 and the the F value is ", format(tForceB[[1]][[1,4]], digits=3), ".",
+                 "The null hypothesis would be there is no significant difference between the counties for suspects of different ethnicities.
+                Since all of probability >F values are extremely small and highly unlikely, we can reject the null hypothesis
+                and assume there is a mean that is not equal to the rest."))
       
     }
   })
