@@ -39,7 +39,7 @@ uof_subjects_omit <- na.omit(uof_subjects)
 uof_arrests_omit <- na.omit(uof_arrests)
 
 ui = fluidPage(
-  titlePanel("Comparing New Jersey Counties: Use of Force and Arrests by Race", window = "Group Module 2"),
+  titlePanel("Use of Force and Arrests: Racial Breakdown by County", window = "Group Module 2"),
   sidebarLayout(
     sidebarPanel(
       selectInput('selectCounty1', 'County 1', choices = sort(c(unique(uof$county))), selected = "Atlantic"),
@@ -99,7 +99,7 @@ server <- function(input,output) {
         facet_grid(facets=. ~ county)  +
         scale_fill_manual(values = c( "yellow4", "darkblue", "maroon"), 
                           labels = c("White", "Black", "Asian/Pacifc Islander")) +
-        labs(fill = "Race", title = "Percent of Arrests of Different Races",
+        labs(fill = "Race", title = "Percent of arrests by race",
              caption = "Certain populations may be under-represented. 
              Hispanic was not an option for arrests on forms in many counties") +
         theme(title = element_text(size = 14, face = "bold"), axis.title = element_blank(), 
@@ -116,7 +116,7 @@ server <- function(input,output) {
         facet_grid(facets=. ~ county)  +
         scale_fill_manual(values = c( "yellow4", "purple", "darkblue", "maroon"), 
                           labels = c("White", "Hispanic", "Black", "Asian/Pacifc Islander")) +
-        labs(fill = "Race", title = "Percent of Races Who Were Victims of Use of Force ",
+        labs(fill = "Race", title = "Percent of use of force victims by race ",
              caption = "Certain populations may be under-represented due to missing data.") +
         theme(title = element_text(size = 14, face = "bold"), axis.title = element_blank(), 
               axis.text = element_blank(), legend.text = element_text(size = 10), 
@@ -128,26 +128,30 @@ server <- function(input,output) {
     if (is.null(input$ethnType)){return ()}
     
     if(input$ethnType == "Arrests") {
-      
-      ggplot(filtered_odds_3(), aes(x = coverage_city, y = odds_ratio_arrests, group = county, fill = county)) + geom_bar(stat = "identity")+
-        #coord_flip() +
+      ggplot(filtered_odds_3(), aes(x = coverage_city, y = odds_ratio_arrests, group = county, fill = county)) + 
+        geom_bar(stat = "identity")+ 
+        coord_flip() +
         scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
-        labs(fill = "County", title = paste0("Odds Ratio of arrest of a black person \nvs a white person in ", input$selectCounty1, " and ", input$selectCounty2, " Counties"),
-             caption = "Towns with missing data are not represented in this graph.") +
+        labs(fill = "County", title = paste0("Odds of a black person getting arrested over a white person in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
+             caption = "Towns with missing data are not represented in this graph.") + 
+        scale_y_log10() +
         theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1), title = element_text(size = 14, face = "bold"), axis.title = element_blank(), legend.text = element_text(size = 10)) 
     }
     
     else if (input$ethnType == "Use of Force Subjects") {
-      ggplot(filtered_odds_2(), aes(x = coverage_city, y = odds_ratio_pop, group = county, fill = county)) + geom_bar(stat = "identity")+
-        #coord_flip() +
-        scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
-        labs(fill = "County", title = paste0("Odds Ratio of Use of Force Against a Black Person \nvs a White Person in ", input$selectCounty1, " and ", input$selectCounty2, " Counties"),
-             caption = "Towns with missing data are not represented in this graph.") +
+      ggplot(filtered_odds_2(), aes(x = coverage_city, y = odds_ratio_pop, group = county, fill = county)) +
+         geom_bar(stat = "identity")+
+         coord_flip() +
+         scale_fill_manual(values = c("#654F6F", "#A8C69F")) + 
+         labs(fill = "County", title = paste0("Odds of use of force being used against a black person \nover a white person in ", input$selectCounty1, " and ", input$selectCounty2, " counties"),
+              caption = "Towns with missing data are not represented in this graph.")  +
+        scale_y_log10() +
         theme(axis.text.x = element_text(angle = 70, vjust = 1, hjust=1), title = element_text(size = 14, face = "bold"), axis.title = element_blank(), legend.text = element_text(size = 10))     }
-  }, width = 700)#, height = 650)
+   }, height = 720)
+ # }}. height = 700))
   
   output$fact = renderText({
-    paste("Disclaimer: Ethnicities marked on forms were up to the discretion of the officers filling out incident forms. In addition to this, some county populations may be under-represented due to missing data or forms lacking options (such as Hispanic arrests).")
+    paste("Disclaimer: Ethnicities marked on forms were up to the discretion of the officers filling out incident forms. In addition to this, some county populations may be under-represented due to missing data or forms lacking options (such as Hispanic not being an option for arrests).")
   })
   
   output$space <- renderUI({
@@ -184,4 +188,3 @@ server <- function(input,output) {
 
 
 shinyApp(ui, server)
-
