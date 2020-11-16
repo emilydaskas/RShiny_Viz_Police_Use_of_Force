@@ -164,10 +164,10 @@ server <- function(input,output) {
       tArrB <- summary(aov(black_arrests_pct_2012_2016~factor(county), data=uof_arrests_omit))
       tArrAPI <- summary(aov(api_arrests_pct_2012_2016~factor(county), data=uof_arrests_omit))
       
-      HTML(paste("An ANOVA analysis was performed between the arrests of different ethnic groups and county. The F value is for white suspects is  ",
+      HTML(paste("An ANOVA analysis was performed between the arrests of different ethnic groups and county. The F value is for White subjects is  ",
                  format(tArrW[[1]][[1,4]],digits=4), ".",
-                 "The F value is for black suspects is  ", format(tArrB[[1]][[1,4]],digits=4),
-                 ".", "The F value is for API suspects is  ", format(tArrAPI[[1]][[1,4]],digits=4), ".", "</br>"))
+                 "The F value is for Black subjects is  ", format(tArrB[[1]][[1,4]],digits=4),
+                 ".", "The F value is for Asian/Pacific Islander (API) subjects is  ", format(tArrAPI[[1]][[1,4]],digits=4), ".", "</br>"))
     }
     else if (input$ethnType == "Use of Force Subjects") {
       tForceW <- summary(aov(white_pct_subjects~factor(county), data=uof_subjects_omit))
@@ -175,11 +175,11 @@ server <- function(input,output) {
       tForceH <- summary(aov(hispanic_pct_subjects~factor(county), data=uof_subjects_omit))
       tForceAPI <- summary(aov(asian_pacific_islander_pct_subjects~factor(county), data=uof_subjects_omit))
       
-      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The F value is for white suspects is  ",
+      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The F value is for White subjects is  ",
                  format(tForceW[[1]][[1,4]],digits=3), ".",
-                 "The F value is for black suspects is  ", format(tForceB[[1]][[1,4]],digits=3), ".", 
-                 "The F value is for API suspects is  ", format(tForceAPI[[1]][[1,4]],digits=3), ".",
-                 "The F value is for hispanic suspects is  ", format(tForceB[[1]][[1,4]], digits=3), "."))
+                 "The F value is for Black subjects is  ", format(tForceB[[1]][[1,4]],digits=3), ".", 
+                 "The F value is for API subjects is  ", format(tForceAPI[[1]][[1,4]],digits=3), ".",
+                 "The F value is for Hispanic subjects is  ", format(tForceB[[1]][[1,4]], digits=3), "."))
       
     }
   })
