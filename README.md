@@ -7,7 +7,9 @@ An RShiny App which uses interactive data visualization to explore a racial brea
 Link to RShiny App:
 https://kaitlynabdo.shinyapps.io/GroupModule2/ 
 
-###### by Emily Daskas and Kaitlyn Abdo
-
 Data formatting and visualization by Emily.
 Statistical tests by Kaitlyn.
+
+
+
+###### by Emily Daskas and Kaitlyn Abdo
