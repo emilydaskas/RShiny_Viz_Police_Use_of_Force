@@ -1,9 +1,9 @@
 # RShiny Police Use of Force 
 
+### 614 Assignment (Module 2)
+
 ###### Data prep and visualization by Emily. Statistical tests by Kaitlyn.
-
-
-### 614 Assignment (Module 2), Nov 2020
+###### Nov 2020
 
 An RShiny App which uses interactive data visualization to explore a racial breakdown of use of force and arrests by police departments.
 
