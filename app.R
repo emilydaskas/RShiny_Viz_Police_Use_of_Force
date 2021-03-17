@@ -1,45 +1,66 @@
 library(shiny)
 library(ggplot2)
 library(dplyr)
+library(shiny)
+library(ggplot2)
+library(dplyr)
 library(reshape2)
 library(rsconnect)
 library(tidyverse)
 
-#setwd("C:\\Users\\Kaitlyn Abdo\\Desktop\\GroupModule2")
-
 uof <- read.csv("UOF_BY_DEPARTMENTS.csv")
 
-##subjects data
+
+
+### data prep functions
+
+format_long_data <- function(data, total_incidents_2012_2016, total_incidents_race_county) {
+  data.long <-  data.long %>% drop_na(total_incidents_2012_2016)
+  
+  #calculating total incedents
+  data.long$incident_count <- data.long$total_incidents_2012_2016 * data.long$value / 100
+  
+  #summarizing data to get the percent incidents by race
+  data.long.summary <- data.long %>% group_by(county, variable) %>% 
+    summarize(total_incidents_race_county = sum(incident_count), total_incidents_county = sum(total_incidents_2012_2016))
+  data.long.summary$percent_incidents <- data.long.summary$total_incidents_race_county / data.long.summary$total_incidents_county
+  
+  return (data)
+}
+
+
+
+### prepping data for use of force subjects
+
 uof_subjects <- uof %>% 
   select(county, white_pct_subjects, hispanic_pct_subjects, black_pct_subjects, 
          asian_pacific_islander_pct_subjects, total_incidents_2012_2016)
-
-
 uof_subjects.long <- melt(uof_subjects, id = c("county", "total_incidents_2012_2016"))
-uof_subjects.long <- melt(uof_subjects, id = c("county", "total_incidents_2012_2016"))
-uof_subjects.long <-  uof_subjects.long %>% drop_na(total_incidents_2012_2016)
-uof_subjects.long$incident_count <- uof_subjects.long$total_incidents_2012_2016 * uof_subjects.long$value / 100
-uof_subjects.long.summary <- uof_subjects.long %>% group_by(county, variable) %>% 
-  summarize(total_incidents_race_county = sum(incident_count), total_incidents_county = sum(total_incidents_2012_2016))
-uof_subjects.long.summary$percent_incidents <- uof_subjects.long.summary$total_incidents_race_county / uof_subjects.long.summary$total_incidents_county
+uof_subjects.long <- format_long_data(uof_subjects, total_incidents_2012_2016, total_incidents_race_county)
 
+
+
+### prepping data for arrests subjects
 
 uof_arrests <- uof %>% 
   select(county, white_arrests_pct_2012_2016, black_arrests_pct_2012_2016, 
          api_arrests_pct_2012_2016, total_arrests_2012_2016)
 uof_arrests.long <- melt(uof_arrests, id = c("county", "total_arrests_2012_2016"))
-uof_arrests.long <-  uof_arrests.long %>% drop_na(total_arrests_2012_2016)
-uof_arrests.long$incident_count <- uof_arrests.long$total_arrests_2012_2016 * uof_arrests.long$value / 100
-uof_arrests.long.summary <- uof_arrests.long %>% group_by(county, variable) %>% 
-  summarize(total_arrests_race_county = sum(incident_count), total_incidents_county = sum(total_arrests_2012_2016))
-uof_arrests.long.summary$percent_incidents <- uof_arrests.long.summary$total_arrests_race_county / uof_arrests.long.summary$total_incidents_county
+uof_arrests.long <- format_long_data(uof_arrests, total_arrests_2012_2016, total_arrests_race_county)
 
 
+
+### getting the odds for odds plot
 uof_odds <- subset(uof, select = c(odds_ratio_pop, odds_ratio_arrests, coverage_city, county))
 
+
+
+### getting rid of na values
 uof_subjects_omit <- na.omit(uof_subjects)
 uof_arrests_omit <- na.omit(uof_arrests)
 
+
+### MARK: rshiny
 ui = fluidPage(
   titlePanel("Use of Force and Arrests: Racial Breakdown by County", window = "Group Module 2"),
   sidebarLayout(
@@ -57,6 +78,7 @@ ui = fluidPage(
     )
   )
 )
+
 
 server <- function(input,output) {
   
@@ -161,7 +183,7 @@ server <- function(input,output) {
   output$space <- renderUI({
     HTML(paste0("</br>"))
   })
-  
+    
   output$percentStats <- renderUI({
     if(input$ethnType == "Arrests") {
       tArrW <- summary(aov(white_arrests_pct_2012_2016~factor(county), data=uof_arrests_omit))
@@ -182,8 +204,7 @@ server <- function(input,output) {
       tForceH <- summary(aov(hispanic_pct_subjects~factor(county), data=uof_subjects_omit))
       tForceAPI <- summary(aov(asian_pacific_islander_pct_subjects~factor(county), data=uof_subjects_omit))
       
-      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The probability >F value is for white suspects is <0.01 and 
-                 the F value is ",
+      HTML(paste("An ANOVA analysis was performed between the use of force on different ethnic groups and county. The probability >F value is for white suspects is <0.01 and the F value is ",
                  format(tForceW[[1]][[1,4]],digits=3), ".",
                  "The probability >F value is for black suspects is <0.01 and the the F value is ", format(tForceB[[1]][[1,4]],digits=3), ".", 
                  "The probability >F value is for API suspects is <0.01 and the the F value is ", format(tForceAPI[[1]][[1,4]],digits=3), ".",
