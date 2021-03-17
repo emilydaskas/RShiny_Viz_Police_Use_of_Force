@@ -2,7 +2,6 @@
 
 ### 614 Assignment (Module 2)
 
-###### Data prep and visualization by Emily. Statistical tests by Kaitlyn.
 ###### Nov 2020
 
 An RShiny App which uses interactive data visualization to explore a racial breakdown of use of force and arrests by police departments.
@@ -27,5 +26,8 @@ Our shiny application is a simple racial breakdown of use of force and arrests a
 
 
 ### Emily Daskas and Kaitlyn Abdo
+
+###### Data prep and visualization by Emily. Statistical tests by Kaitlyn.
+
 
 
